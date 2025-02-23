@@ -58,7 +58,7 @@ public class WebScraperService {
 
         ChromeOptions options = new ChromeOptions();
         options.setBinary(CHROME_BINARY_PATH);
-        options.addArguments("--headless");
+//        options.addArguments("--headless");
         options.addArguments("window-size=1920,1080");
         options.addArguments("--disable-blink-features=AutomationControlled");
         options.addArguments("--disable-gpu");
