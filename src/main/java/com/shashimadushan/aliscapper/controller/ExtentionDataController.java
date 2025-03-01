@@ -16,7 +16,7 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class ExtentionDataController {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+//    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private ProductService productService;
@@ -24,18 +24,14 @@ public class ExtentionDataController {
     @PostMapping("/receive")
     public Response receiveScrapedData(@RequestBody Map<String, Object> scrapedData) {
         try {
-            // Convert Map to JSON String (for logging)
-            String jsonData = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(scrapedData);
-            System.out.println("Received Scraped Data as JSON:");
-            System.out.println(jsonData);
+//            String jsonData = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(scrapedData);
+//            System.out.println("Received Scraped Data as JSON:");
+//            System.out.println(jsonData);
 
-            // Convert Map to Product model
             Product product = mapToProduct(scrapedData);
 
-            // Save product to MongoDB
             productService.saveProduct(product);
 
-            // Return success response
             Response response = new Response();
             response.setStatus("success");
             response.setMessage("Data received and saved successfully!");
@@ -49,7 +45,6 @@ public class ExtentionDataController {
         }
     }
 
-    // Method to convert scraped data Map to Product object
     private Product mapToProduct(Map<String, Object> scrapedData) {
         Product product = new Product();
         product.setProductID((String) scrapedData.get("productID"));

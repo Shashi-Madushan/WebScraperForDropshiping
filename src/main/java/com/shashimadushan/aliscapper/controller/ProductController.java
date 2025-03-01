@@ -1,36 +1,42 @@
 package com.shashimadushan.aliscapper.controller;
 
-import com.shashimadushan.aliscapper.model.Product;
-import com.shashimadushan.aliscapper.service.ProductService;
+
+import com.shashimadushan.aliscapper.dto.ProductDTO;
+import com.shashimadushan.aliscapper.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.shashimadushan.aliscapper.model.Product;
+import com.shashimadushan.aliscapper.service.ProductService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/products")
+@CrossOrigin(origins = "*")
 public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private JwtUtil jwtUtils;
+
     @GetMapping
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
+    public List<ProductDTO> getUserProducts(@RequestHeader("Authorization") String token) {
+        String userId = jwtUtils.extractUsername(token.replace("Bearer ", ""));
+        return productService.getUserProducts(userId);
     }
 
-    @GetMapping("/{id}")
-    public Optional<Product> getProductById(@PathVariable String id) {
-        return productService.getProductById(id);
-    }
-
-    @PostMapping
-    public Product saveProduct(@RequestBody Product product) {
-        return productService.saveProduct(product);
+    @PostMapping("/create")
+    public Product createProduct(@RequestBody ProductDTO productDto, @RequestHeader("Authorization") String token) {
+        String username = jwtUtils.extractUsername(token.replace("Bearer ", ""));
+        productDto.setUserName(username);
+        return productService.saveProduct(productDto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable String id) {
-        productService.deleteProduct(id);
+    public String deleteProduct(@PathVariable String id, @RequestHeader("Authorization") String token) {
+        String userId = jwtUtils.extractUsername(token.replace("Bearer ", ""));
+        productService.deleteProduct(id, userId);
+        return "Product deleted successfully!";
     }
 }

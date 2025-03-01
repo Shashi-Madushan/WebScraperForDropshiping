@@ -1,20 +1,19 @@
-package com.shashimadushan.aliscapper.model;
+package com.shashimadushan.aliscapper.dto;
 
+import com.shashimadushan.aliscapper.model.Description;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.List;
 import java.util.Map;
 
-@Document(collection = "products")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter
-public class Product {
-    @Id
+@Getter
+@Setter
+public class ProductDTO {
     private String id;
     private String productID;
     private String productName;
@@ -28,6 +27,4 @@ public class Product {
     private List<Description> description;
     private Map<String, String> specifications;
     private String userName;
-
-
 }
