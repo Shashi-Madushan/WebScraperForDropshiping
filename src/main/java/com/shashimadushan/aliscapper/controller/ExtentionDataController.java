@@ -1,10 +1,13 @@
 package com.shashimadushan.aliscapper.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shashimadushan.aliscapper.dto.ProductDTO;
 import com.shashimadushan.aliscapper.model.Product;
 import com.shashimadushan.aliscapper.model.Response;
 import com.shashimadushan.aliscapper.model.Description;
+import com.shashimadushan.aliscapper.security.JwtUtil;
 import com.shashimadushan.aliscapper.service.ProductService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,21 +19,26 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class ExtentionDataController {
 
-//    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private ModelMapper modelMapper = new ModelMapper();
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @PostMapping("/receive")
-    public Response receiveScrapedData(@RequestBody Map<String, Object> scrapedData) {
+    public Response receiveScrapedData(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, Object> scrapedData) {
         try {
-//            String jsonData = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(scrapedData);
-//            System.out.println("Received Scraped Data as JSON:");
-//            System.out.println(jsonData);
+            System.out.println(authHeader);
+            String token = authHeader.substring(7);
+            System.out.println(token);
+
+            String username = jwtUtil.extractUsername(token);
 
             Product product = mapToProduct(scrapedData);
-
-            productService.saveProduct(product);
+            product.setUserName(username);
+            ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
+            productService.saveProduct(productDTO);
 
             Response response = new Response();
             response.setStatus("success");

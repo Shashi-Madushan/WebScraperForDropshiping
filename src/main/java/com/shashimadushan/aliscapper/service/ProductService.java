@@ -17,8 +17,8 @@ public class ProductService {
     private ProductRepository productRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
-    public List<ProductDTO> getUserProducts(String userId) {
-        List<Product> products = productRepository.findByUserId(userId);
+    public List<ProductDTO> getUserProducts(String username) {
+        List<Product> products = productRepository.findByUserName(username);
         return products.stream()
                        .map(this::convertToDto)
                        .collect(Collectors.toList());

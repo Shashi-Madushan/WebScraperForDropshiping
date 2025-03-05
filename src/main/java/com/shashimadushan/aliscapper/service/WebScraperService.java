@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
+
 @Service
 public class WebScraperService {
     private static final Logger logger = LoggerFactory.getLogger(WebScraperService.class);
