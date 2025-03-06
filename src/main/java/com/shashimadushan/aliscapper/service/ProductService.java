@@ -4,6 +4,7 @@ import com.shashimadushan.aliscapper.dto.ProductDTO;
 import com.shashimadushan.aliscapper.model.Product;
 import com.shashimadushan.aliscapper.repo.ProductRepository;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,5 +50,10 @@ public class ProductService {
 
     private Product convertToEntity(ProductDTO productDTO) {
         return modelMapper.map(productDTO, Product.class);
+    }
+
+    public List<ProductDTO> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        return modelMapper.map(products, new TypeToken<List<ProductDTO>>() {}.getType());
     }
 }

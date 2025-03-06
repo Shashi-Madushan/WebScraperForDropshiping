@@ -4,6 +4,8 @@ package com.shashimadushan.aliscapper.controller;
 import com.shashimadushan.aliscapper.dto.ProductDTO;
 import com.shashimadushan.aliscapper.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.shashimadushan.aliscapper.model.Product;
 import com.shashimadushan.aliscapper.service.ProductService;
@@ -38,5 +40,10 @@ public class ProductController {
         String userId = jwtUtils.extractUsername(token.replace("Bearer ", ""));
         productService.deleteProduct(id, userId);
         return "Product deleted successfully!";
+    }
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 }
