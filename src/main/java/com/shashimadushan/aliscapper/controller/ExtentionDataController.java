@@ -29,9 +29,7 @@ public class ExtentionDataController {
     @PostMapping("/receive")
     public Response receiveScrapedData(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, Object> scrapedData) {
         try {
-            System.out.println(authHeader);
             String token = authHeader.substring(7);
-            System.out.println(token);
 
             String username = jwtUtil.extractUsername(token);
 

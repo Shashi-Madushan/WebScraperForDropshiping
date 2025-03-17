@@ -56,4 +56,8 @@ public class ProductService {
         List<Product> products = productRepository.findAll();
         return modelMapper.map(products, new TypeToken<List<ProductDTO>>() {}.getType());
     }
+
+    public void deleteProduct(String productId) {
+        productRepository.deleteById(productId);
+    }
 }

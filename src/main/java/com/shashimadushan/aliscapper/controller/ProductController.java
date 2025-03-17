@@ -28,6 +28,13 @@ public class ProductController {
         return productService.getUserProducts(userId);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable String id, @RequestHeader("Authorization") String token) {
+        String userId = jwtUtils.extractUsername(token.replace("Bearer ", ""));
+        return productService.getProductById(id, userId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
     @PostMapping("/create")
     public Product createProduct(@RequestBody ProductDTO productDto, @RequestHeader("Authorization") String token) {
         String username = jwtUtils.extractUsername(token.replace("Bearer ", ""));
