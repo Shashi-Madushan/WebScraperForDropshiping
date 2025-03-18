@@ -11,6 +11,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class AuthService {
     @Autowired
@@ -33,7 +36,7 @@ public class AuthService {
         return "User registered successfully";
     }
 
-    public String login(String username, String password) {
+    public Map<String, String> login(String username, String password) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -41,6 +44,14 @@ public class AuthService {
             throw new BadCredentialsException("Invalid credentials");
         }
 
-        return jwtUtil.generateToken(username ,user.getRole());
+        String token = jwtUtil.generateToken(username, user.getRole());
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        response.put("userRole", user.getRole().name());
+        return response;
+    }
+    public boolean isAdmin(String token) {
+        String role = jwtUtil.extractRole(token.substring(7));
+        return User.Role.ADMIN.name().equals(role);
     }
 }

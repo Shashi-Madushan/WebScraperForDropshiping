@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     @Autowired
     private AuthService authService;
@@ -23,9 +24,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody AuthRequest request) {
-        String token = authService.login(request.getUsername(), request.getPassword());
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
+        Map<String, String> authResponse = authService.login(request.getUsername(), request.getPassword());
+        return ResponseEntity.ok(authResponse);
+    }
+
+    @GetMapping("/check-admin")
+    public ResponseEntity<Map<String, Boolean>> checkAdmin(@RequestHeader("Authorization") String token) {
+
+        boolean isAdmin = authService.isAdmin(token);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isAdmin", isAdmin);
         return ResponseEntity.ok(response);
     }
 }
