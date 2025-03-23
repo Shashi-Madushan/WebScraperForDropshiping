@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -27,4 +28,6 @@ public class ProductDTO {
     private List<Description> description;
     private Map<String, String> specifications;
     private String userName;
+    private LocalDate creationDate;
+
 }

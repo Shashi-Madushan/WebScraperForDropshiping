@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +30,7 @@ public class Product {
     private List<Description> description;
     private Map<String, String> specifications;
     private String userName;
+    private LocalDate creationDate;
 
 
 }

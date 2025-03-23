@@ -1,6 +1,8 @@
 package com.shashimadushan.aliscapper.controller;
 
 
+import com.shashimadushan.aliscapper.dto.DailyProductCountDTO;
+import com.shashimadushan.aliscapper.dto.ProductCountDTO;
 import com.shashimadushan.aliscapper.dto.ProductDTO;
 import com.shashimadushan.aliscapper.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +13,10 @@ import com.shashimadushan.aliscapper.model.Product;
 import com.shashimadushan.aliscapper.service.ProductService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = "*")
 public class ProductController {
     @Autowired
     private ProductService productService;
@@ -52,5 +54,26 @@ public class ProductController {
     @GetMapping("/all")
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<ProductCountDTO> getUserProductCount(@RequestHeader("Authorization") String token) {
+        String userId = jwtUtils.extractUsername(token.replace("Bearer ", ""));
+        long count = productService.getUserProductCount(userId);
+        return ResponseEntity.ok(new ProductCountDTO(userId, count));
+    }
+
+    @GetMapping("/daily-count")
+    public ResponseEntity<List<DailyProductCountDTO>> getUserDailyProductCount(@RequestHeader("Authorization") String token) {
+        String userId = jwtUtils.extractUsername(token.replace("Bearer ", ""));
+        List<DailyProductCountDTO> dailyCounts = productService.getUserDailyProductCount(userId);
+        return ResponseEntity.ok(dailyCounts);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/all-users/daily-count")
+    public ResponseEntity<Map<String, List<DailyProductCountDTO>>> getAllUsersDailyProductCount() {
+        Map<String, List<DailyProductCountDTO>> allUsersDailyCounts = productService.getAllUsersDailyProductCount();
+        return ResponseEntity.ok(allUsersDailyCounts);
     }
 }

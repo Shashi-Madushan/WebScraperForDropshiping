@@ -17,7 +17,7 @@ public class User {
     private String email;
     private String password;
     private Status status=Status.ACTIVE;
-    private Role role = Role.USER; // Default role set to USER
+    private Role role = Role.USER;
 
     public enum Role {
         USER, ADMIN
