@@ -2,7 +2,8 @@ package com.shashimadushan.aliscapper.controller;
 
 import com.shashimadushan.aliscapper.dto.ConnectedStoreDto;
 import com.shashimadushan.aliscapper.dto.ConnectedStoreResponseDto;
-import com.shashimadushan.aliscapper.service.ConnectedStoreService;
+import com.shashimadushan.aliscapper.security.JwtUtil;
+import com.shashimadushan.aliscapper.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,26 +19,28 @@ import java.util.List;
  * updating store credentials, and removing connected stores
  */
 @RestController
-@RequestMapping("/api/v1/stores")
+@RequestMapping("/api/stores")
 @RequiredArgsConstructor
 @Slf4j
 public class ConnectedStoresController {
 
-    private final ConnectedStoreService connectedStoreService;
-
+    private final StoreService storeService;
+    private final JwtUtil jwtUtils;
 
     @PostMapping
-    public ResponseEntity<ConnectedStoreResponseDto> connectStore(@RequestBody ConnectedStoreDto storeDto) {
+    public ResponseEntity<ConnectedStoreResponseDto> connectStore(@RequestBody ConnectedStoreDto storeDto ,@RequestHeader("Authorization") String token ) {
         log.info("Received request to connect new store: {}", storeDto.getStoreName());
-        ConnectedStoreResponseDto connectedStore = connectedStoreService.connectStore(storeDto);
+        String username = jwtUtils.extractUsername(token.substring(7));
+        ConnectedStoreResponseDto connectedStore = storeService.connectStore(storeDto,username);
         return new ResponseEntity<>(connectedStore, HttpStatus.CREATED);
     }
 
 
     @GetMapping
-    public ResponseEntity<List<ConnectedStoreResponseDto>> getAllConnectedStores() {
-        log.info("Retrieving all connected stores");
-        List<ConnectedStoreResponseDto> stores = connectedStoreService.getAllStores();
+    public ResponseEntity<List<ConnectedStoreResponseDto>> getAllConnectedStores(@RequestHeader("Authorization") String token) {
+        System.out.println("Retrieving all connected stores");
+        String username = jwtUtils.extractUsername(token.substring(7));
+        List<ConnectedStoreResponseDto> stores = storeService.getAllStores(username);
         return ResponseEntity.ok(stores);
     }
 
@@ -45,7 +48,7 @@ public class ConnectedStoresController {
     @GetMapping("/{storeId}")
     public ResponseEntity<ConnectedStoreResponseDto> getConnectedStore(@PathVariable String storeId) {
         log.info("Retrieving store with ID: {}", storeId);
-        ConnectedStoreResponseDto store = connectedStoreService.getStoreById(storeId);
+        ConnectedStoreResponseDto store = storeService.getStoreById(storeId);
         return ResponseEntity.ok(store);
     }
 
@@ -55,7 +58,7 @@ public class ConnectedStoresController {
             @PathVariable String storeId,
             @RequestBody ConnectedStoreDto storeDto) {
         log.info("Updating store with ID: {}", storeId);
-        ConnectedStoreResponseDto updatedStore = connectedStoreService.updateStore(storeId, storeDto);
+        ConnectedStoreResponseDto updatedStore = storeService.updateStore(storeId, storeDto);
         return ResponseEntity.ok(updatedStore);
     }
 
@@ -63,14 +66,14 @@ public class ConnectedStoresController {
     @DeleteMapping("/{storeId}")
     public ResponseEntity<Void> deleteConnectedStore(@PathVariable String storeId) {
         log.info("Deleting store with ID: {}", storeId);
-        connectedStoreService.deleteStore(storeId);
+        storeService.deleteStore(storeId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{storeId}/verify")
     public ResponseEntity<Boolean> verifyStoreConnection(@PathVariable String storeId) {
         log.info("Verifying connection for store with ID: {}", storeId);
-        boolean isConnected = connectedStoreService.verifyStoreConnection(storeId);
+        boolean isConnected = storeService.verifyStoreConnection(storeId);
         return ResponseEntity.ok(isConnected);
     }
 }

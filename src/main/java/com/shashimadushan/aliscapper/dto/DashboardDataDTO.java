@@ -11,7 +11,7 @@ import java.util.List;
 public class DashboardDataDTO {
     private ProductCountDTO productCount;
     private List<DailyProductCountDTO> dailyProductCounts;
-    private List<ConnectedStoreResponseDto> connectedStores;
+    private int connectedStores;
 
 
 }

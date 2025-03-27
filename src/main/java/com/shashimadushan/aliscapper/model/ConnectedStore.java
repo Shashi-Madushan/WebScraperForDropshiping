@@ -10,8 +10,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
  */
 @Document(collection = "connected_stores")
 @CompoundIndexes({
-        @CompoundIndex(name = "user_store_idx", def = "{'userId': 1, 'storeName': 1}", unique = true)
+        @CompoundIndex(name = "user_store_idx", def = "{'username': 1, 'storeName': 1}", unique = true)
 })
 @Data
 @Builder
@@ -56,7 +56,8 @@ public class ConnectedStore {
 
     private int orderCount;
 
-    private String userId;
+    @Indexed
+    private String username;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;

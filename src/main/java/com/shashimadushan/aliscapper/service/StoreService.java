@@ -21,19 +21,18 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ConnectedStoreService {
+public class StoreService {
 
     private final ConnectedStoreRepository storeRepository;
-    private final UserService userService;
+    private final ConnectedStoreRepository connectedStoreRepository;
 
 
-
-    public ConnectedStoreResponseDto connectStore(ConnectedStoreDto storeDto) {
+    public ConnectedStoreResponseDto connectStore(ConnectedStoreDto storeDto ,String username) {
         log.info("Connecting new store: {}", storeDto.getStoreName());
 
-        String currentUserId = "";
 
-        if (storeRepository.existsByStoreNameAndUserId(storeDto.getStoreName(), currentUserId)) {
+
+        if (storeRepository.existsByStoreNameAndUsername(storeDto.getStoreName(), username)) {
             System.out.println(("A store with this name is already connected"));
         }
 
@@ -44,7 +43,7 @@ public class ConnectedStoreService {
 
         // Create and save the new store
         ConnectedStore store = mapToDocument(storeDto);
-        store.setUserId(currentUserId);
+        store.setUsername(username);
         store.setConnected(true);
         store.setConnectedAt(LocalDateTime.now());
 
@@ -55,9 +54,9 @@ public class ConnectedStoreService {
     }
 
 
-    public List<ConnectedStoreResponseDto> getAllStores() {
-        String currentUserId = "";
-        List<ConnectedStore> stores = storeRepository.findByUserId(currentUserId);
+    public List<ConnectedStoreResponseDto> getAllStores( String username) {
+
+        List<ConnectedStore> stores = storeRepository.findByUsername(username);
 
         return stores.stream()
                 .map(this::mapToResponseDto)
@@ -132,7 +131,7 @@ public class ConnectedStoreService {
 
 
         // Verify the store belongs to the current user
-        if (!store.get().getUserId().equals(currentUserId)) {
+        if (!store.get().getUsername().equals(currentUserId)) {
             System.out.println(("Store not found with ID: " + storeId));
         }
 
@@ -200,5 +199,8 @@ public class ConnectedStoreService {
         }
 
         return apiKey.substring(0, 4) + "****" + apiKey.substring(apiKey.length() - 4);
+    }
+    public   int getConnetedStoreCount(String username){
+        return connectedStoreRepository.countByUsername(username);
     }
 }

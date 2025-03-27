@@ -3,6 +3,7 @@ package com.shashimadushan.aliscapper.controller;
 import com.shashimadushan.aliscapper.dto.ProductDTO;
 import com.shashimadushan.aliscapper.dto.UserDTO;
 import com.shashimadushan.aliscapper.service.ProductService;
+import com.shashimadushan.aliscapper.service.UserDataService;
 import com.shashimadushan.aliscapper.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +20,20 @@ public class AdminController {
     private  UserService userService;
     @Autowired
     private  ProductService productService;
-
+    @Autowired
+    private UserDataService userDataService;
 
 
     // 1️⃣ Get All Users
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+        return ResponseEntity.ok(userDataService.getAllUsers());
     }
 
     // 2️⃣ Delete a User by ID
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable String userId) {
-        userService.deleteUser(userId);
+        userDataService.deleteUser(userId);
         return ResponseEntity.ok("User deleted successfully.");
     }
 
