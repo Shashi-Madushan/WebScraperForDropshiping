@@ -79,7 +79,7 @@ public class StoreService {
         existingStore.setApiKey(storeDto.getApiKey());
         existingStore.setApiSecret(storeDto.getApiSecret());
         existingStore.setAccessToken(storeDto.getAccessToken());
-        existingStore.setStoreIdentifier(storeDto.getStoreIdentifier());
+
 
         // Test connection with updated credentials
         boolean connectionSuccessful = testConnection(storeDto);
@@ -107,7 +107,6 @@ public class StoreService {
                 .apiKey(store.getApiKey())
                 .apiSecret(store.getApiSecret())
                 .accessToken(store.getAccessToken())
-                .storeIdentifier(store.getStoreIdentifier())
                 .build();
 
         boolean isConnected = testConnection(storeDto);
@@ -168,7 +167,6 @@ public class StoreService {
                 .apiKey(dto.getApiKey())
                 .apiSecret(dto.getApiSecret())
                 .accessToken(dto.getAccessToken())
-                .storeIdentifier(dto.getStoreIdentifier())
                 .build();
     }
 

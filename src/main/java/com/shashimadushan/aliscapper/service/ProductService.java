@@ -26,8 +26,8 @@ public class ProductService {
     public List<ProductDTO> getUserProducts(String username) {
         List<Product> products = productRepository.findByUserName(username);
         return products.stream()
-                       .map(this::convertToDto)
-                       .collect(Collectors.toList());
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     public Optional<ProductDTO> getProductById(String id, String userId) {
@@ -50,6 +50,21 @@ public class ProductService {
         });
     }
 
+    public Product updateProduct(String id, ProductDTO productDTO, String userName) {
+        return productRepository.findById(id)
+                .filter(product -> product.getUserName().equals(userName))
+                .map(existingProduct -> {
+                    // Update fields but preserve the original userName and creation date
+                    Product updatedProduct = convertToEntity(productDTO);
+                    updatedProduct.setId(id);
+                    updatedProduct.setUserName(existingProduct.getUserName());
+                    updatedProduct.setCreationDate(existingProduct.getCreationDate());
+
+                    return productRepository.save(updatedProduct);
+                })
+                .orElse(null);
+    }
+
     private ProductDTO convertToDto(Product product) {
         return modelMapper.map(product, ProductDTO.class);
     }
@@ -60,15 +75,18 @@ public class ProductService {
 
     public List<ProductDTO> getAllProducts() {
         List<Product> products = productRepository.findAll();
-        return modelMapper.map(products, new TypeToken<List<ProductDTO>>() {}.getType());
+        return modelMapper.map(products, new TypeToken<List<ProductDTO>>() {
+        }.getType());
     }
 
     public void deleteProduct(String productId) {
         productRepository.deleteById(productId);
     }
+
     public long getUserProductCount(String userName) {
         return productRepository.countByUserName(userName);
     }
+
     public List<DailyProductCountDTO> getUserDailyProductCount(String userName) {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(29); // Last 30 days including today

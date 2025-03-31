@@ -43,8 +43,6 @@ public class ConnectedStore {
 
     private String accessToken;
 
-    private String storeIdentifier;
-
     private boolean connected;
 
     @CreatedDate

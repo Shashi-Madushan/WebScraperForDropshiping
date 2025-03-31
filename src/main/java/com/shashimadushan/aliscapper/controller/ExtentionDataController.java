@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,11 +69,24 @@ public class ExtentionDataController {
         // Convert specifications map correctly
         product.setSpecifications((Map<String, String>) scrapedData.get("specifications"));
 
-        // Convert description data
-        List<Map<String, Object>> descriptionData = (List<Map<String, Object>>) scrapedData.get("description");
-        List<Description> descriptions = descriptionData.stream()
-            .map(data -> new Description((Map<String, String>) data.get("attributes"), (List<String>) data.get("images"), (String) data.get("text")))
-            .toList();
+        // Handle description data - could be either an object or an array
+        Object descriptionObj = scrapedData.get("description");
+        List<Description> descriptions = new ArrayList<>();
+
+        if (descriptionObj instanceof List) {
+            // Handle when description is a list
+            List<Map<String, Object>> descriptionList = (List<Map<String, Object>>) descriptionObj;
+            descriptions = descriptionList.stream()
+                    .map(data -> new Description( (String) data.get("text"),(List<String>) data.get("images")))
+                    .toList();
+        } else if (descriptionObj instanceof Map) {
+            // Handle when description is a single object
+            Map<String, Object> descriptionMap = (Map<String, Object>) descriptionObj;
+            descriptions.add(new Description(
+
+                    (String) descriptionMap.get("text"),(List<String>) descriptionMap.get("images")));
+        }
+
         product.setDescription(descriptions);
 
         return product;

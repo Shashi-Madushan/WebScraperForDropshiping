@@ -30,4 +30,5 @@ public class ProductDTO {
     private String userName;
     private LocalDate creationDate;
 
+
 }
