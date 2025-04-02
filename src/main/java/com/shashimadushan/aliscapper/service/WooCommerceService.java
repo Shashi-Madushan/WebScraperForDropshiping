@@ -15,6 +15,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -39,53 +40,59 @@ public class WooCommerceService {
         this.objectMapper = objectMapper;
     }
 
-    public ResponseEntity<String> importProductToWooCommerce(String username, String storeId, ProductDTO productDTO) {
+    public ResponseEntity<String> importProductToWooCommerce(String username, String storeId, JSONObject woocomerceproduct) {
+
         try {
             // Validate input parameters
-            if (username == null || storeId == null || productDTO == null) {
+            if (username == null || storeId == null || woocomerceproduct == null) {
+
                 throw new WooCommerceException("Username, storeId, and productJson cannot be null");
             }
 
-            // Find user
+
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new WooCommerceException("User not found: " + username));
 
+
             // Find store
+
             ConnectedStore connectedStore = connectedStoreRepository.findById(storeId)
                     .orElseThrow(() -> new WooCommerceException("Store not found with ID: " + storeId));
 
-            // Verify store is connected
-            if (!connectedStore.isConnected()) {
-                throw new WooCommerceException("WooCommerce store is not connected: " + connectedStore.getStoreUrl());
-            }
 
-            // Convert ProductDTO to JSON string
-            String productJson;
-            try {
-                productJson = objectMapper.writeValueAsString(productDTO);
-                // Validate JSON
-                objectMapper.readTree(productJson);
-            } catch (JsonProcessingException e) {
-                throw new WooCommerceException("Invalid product JSON format: " + e.getMessage());
-            }
-
-            return sendProductToWooCommerce(connectedStore, productJson);
+            System.out.println("Calling sendProductToWooCommerce");
+            return sendProductToWooCommerce(connectedStore, woocomerceproduct);
 
         } catch (WooCommerceException e) {
+
             logger.error("WooCommerce import error: {}", e.getMessage());
             return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
                     .body(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("Unexpected error during WooCommerce import", e);
             return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred: " + e.getMessage());
         }
     }
 
-    private ResponseEntity<String> sendProductToWooCommerce(ConnectedStore store, String productJson) throws WooCommerceException {
+    private ResponseEntity<String> sendProductToWooCommerce(ConnectedStore store, JSONObject productJson) throws WooCommerceException {
+//        // Clean up price values by removing commas
+//        if (productJson.has("regular_price")) {
+//            String regularPrice = productJson.getString("regular_price").replace(",", "");
+//            productJson.put("regular_price", regularPrice);
+//        }
+//
+//        if (productJson.has("sale_price")) {
+//            String salePrice = productJson.getString("sale_price").replace(",", "");
+//            productJson.put("sale_price", salePrice);
+//        }
         String url = store.getStoreUrl() + "/wp-json/wc/v3/products";
+        System.out.println("Sending product to WooCommerce API URL: " + url);
+        System.out.println("Using API Key: " + store.getApiKey().substring(0, 4) + "...");
 
         try (CloseableHttpClient client = HttpClients.createDefault()) {
+
             HttpPost request = new HttpPost(url);
 
             // Set authentication and headers
@@ -94,23 +101,33 @@ public class WooCommerceService {
             request.setHeader("Authorization", "Basic " + encodedAuth);
             request.setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE);
 
+
             // Set request body
-            request.setEntity(new StringEntity(productJson, StandardCharsets.UTF_8));
+            request.setEntity(new StringEntity(String.valueOf(productJson), StandardCharsets.UTF_8));
+
 
             // Execute request
+
             try (CloseableHttpResponse response = client.execute(request)) {
                 int statusCode = response.getStatusLine().getStatusCode();
+                System.out.println("Received response with status code: " + statusCode);
+
                 String responseBody = org.apache.http.util.EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+                System.out.println("Response body length: " + responseBody.length());
+                System.out.println("Response body preview: " + (responseBody.length() > 100 ? responseBody.substring(0, 100) + "..." : responseBody));
 
                 if (statusCode >= HttpStatus.SC_OK && statusCode < HttpStatus.SC_MULTIPLE_CHOICES) {
+                    System.out.println("Successful response");
                     return ResponseEntity.status(org.springframework.http.HttpStatus.valueOf(statusCode)).body(responseBody);
                 } else {
+                    System.out.println("Error response from WooCommerce API");
                     logger.error("WooCommerce API error: {} - {}", statusCode, responseBody);
                     return ResponseEntity.status(org.springframework.http.HttpStatus.valueOf(statusCode))
                             .body("WooCommerce API error: " + responseBody);
                 }
             }
         } catch (IOException e) {
+            e.printStackTrace();
             logger.error("Error communicating with WooCommerce API", e);
             throw new WooCommerceException("Error communicating with WooCommerce API: " + e.getMessage());
         }

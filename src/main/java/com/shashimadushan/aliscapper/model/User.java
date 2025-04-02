@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Document(collection = "users")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,6 +20,7 @@ public class User {
     private String password;
     private Status status=Status.ACTIVE;
     private Role role = Role.USER;
+    private Date createdAt = new Date();
 
     public enum Role {
         USER, ADMIN

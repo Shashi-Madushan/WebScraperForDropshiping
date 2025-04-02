@@ -2,11 +2,9 @@ package com.shashimadushan.aliscapper.service;
 
 
 
-import com.shashimadushan.aliscapper.dto.UserDTO;
+
 import com.shashimadushan.aliscapper.model.User;
 import com.shashimadushan.aliscapper.repo.UserRepository;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -29,6 +29,9 @@ public class ProductService {
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
+    public long getTotalProducts() {
+        return productRepository.count();
+    }
 
     public Optional<ProductDTO> getProductById(String id, String userId) {
         return productRepository.findById(id)

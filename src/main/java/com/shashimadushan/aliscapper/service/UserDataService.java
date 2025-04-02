@@ -10,6 +10,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -21,7 +25,7 @@ public class UserDataService {
     private ModelMapper modelMapper = new ModelMapper();
 
     public boolean deleteUser(String username) {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findById(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         user.setStatus(User.Status.INACTIVE);
         User deleteduser= userRepository.save(user);
@@ -87,4 +91,19 @@ public class UserDataService {
         User savedUser = userRepository.save(user);
         return modelMapper.map(savedUser, UserDTO.class);
     }
+    public long getTotalActiveUsers() {
+        return userRepository.findAll().stream()
+                .filter(user -> user.getStatus() == User.Status.ACTIVE)
+                .count();
+    }
+
+    public long getNewUsersThisWeek() {
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minus(7, ChronoUnit.DAYS);
+        Date oneWeekAgoDate = Date.from(oneWeekAgo.atZone(ZoneId.systemDefault()).toInstant());
+
+        return userRepository.findAll().stream()
+                .filter(user -> user.getCreatedAt() != null && user.getCreatedAt().after(oneWeekAgoDate))
+                .count();
+    }
+
 }

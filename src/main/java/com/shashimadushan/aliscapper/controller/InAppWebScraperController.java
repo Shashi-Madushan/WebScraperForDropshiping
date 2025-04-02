@@ -48,7 +48,6 @@ public class InAppWebScraperController {
             }
 
             ProductDTO productDTO = new ProductDTO();
-            productDTO.setProductID(getStringValue(productData, "productID"));
             productDTO.setProductName(getStringValue(productData, "productName"));
             productDTO.setCurrentPrice(getStringValue(productData, "currentPrice"));
             productDTO.setOriginalPrice(getStringValue(productData, "originalPrice"));

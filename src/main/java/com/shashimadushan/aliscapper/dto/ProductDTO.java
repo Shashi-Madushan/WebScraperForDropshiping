@@ -16,7 +16,7 @@ import java.util.Map;
 @Setter
 public class ProductDTO {
     private String id;
-    private String productID;
+
     private String productName;
     private String currentPrice;
     private String originalPrice;

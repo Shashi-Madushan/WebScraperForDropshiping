@@ -30,7 +30,6 @@ public class AuthService {
         if (userRepository.existsByEmail(reqUser.getEmail())) {
             throw new IllegalArgumentException("Email is already registered");
         }
-
         reqUser.setPassword(passwordEncoder.encode(reqUser.getPassword()));
         User user = modelMapper.map(reqUser, User.class);
         userRepository.save(user);

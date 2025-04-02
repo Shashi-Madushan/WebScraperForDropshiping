@@ -52,6 +52,9 @@ public class StoreService {
 
         return mapToResponseDto(savedStore);
     }
+    public long getTotalStores() {
+        return storeRepository.count();
+    }
 
 
     public List<ConnectedStoreResponseDto> getAllStores( String username) {

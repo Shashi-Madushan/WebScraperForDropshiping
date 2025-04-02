@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 
 
 @AllArgsConstructor
@@ -19,4 +20,5 @@ public class UserDTO {
     private String password;
     private User.Status status;
     private User.Role role;
+    private Date createdAt;
 }
