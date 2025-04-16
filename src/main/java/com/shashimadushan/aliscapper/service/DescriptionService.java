@@ -48,7 +48,7 @@ public class DescriptionService {
         headers.set("X-Title", siteName);     // Site title for rankings on openrouter.ai
 
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", "deepseek/deepseek-r1:free");
+        requestBody.put("model", "deepseek/deepseek-chat-v3-0324:free");
         List<Map<String, String>> messages = new ArrayList<>();
         messages.add(Map.of("role", "system", "content", "You are an AI-powered product description generator for WooCommerce."));
 
